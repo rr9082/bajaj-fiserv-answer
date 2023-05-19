@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Data Rendering</title>
+    <style>
+        /* Add your CSS styles here to create an appealing UI */
+    </style>
+</head>
+<body>
+    
+    <link href="style.css" rel="stylesheet" />
+    
+    <h1>Developers</h1>
+    
+    <input type="text" id="searchName" placeholder="Search by name">
+    <input type="text" id="filterDesignation" placeholder="Filter by designation/skills">
+
+    <table id="developersTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Skills</th>
+            </tr>
+        </thead>
+        <tbody id="developersBody">
+            <!-- Developers data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <h1>Projects</h1>
+
+    <table id="projectsTable">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Team Size</th>
+                <th>Completed Tasks</th>
+            </tr>
+        </thead>
+        <tbody id="projectsBody">
+            <!-- Projects data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch JSON data from the provided URL
+        fetch('https://raw.githubusercontent.com/dixitsoham7/dixitsoham7.github.io/main/index.json')
+            .then(response => response.json())
+            .then(data => {
+                // Render developers
+                const developersTable = document.getElementById('developersBody');
+                data.developers.forEach(developer => {
+                    const row = developersTable.insertRow();
+                    row.innerHTML = `<td>${developer.name}</td><td>${developer.designation}</td><td>${developer.skills.join(', ')}</td>`;
+                });
+
+                // Render projects
+                const projectsTable = document.getElementById('projectsBody');
+                data.projects.forEach(project => {
+                    const row = projectsTable.insertRow();
+                    row.innerHTML = `<td>${project.name}</td><td>${project.teamSize}</td><td>${project.completedTasks}</td>`;
+                });
+
+                // Add event listeners for filtering and searching
+                const searchNameInput = document.getElementById('searchName');
+                const filterDesignationInput = document.getElementById('filterDesignation');
+
+                searchNameInput.addEventListener('input', filterDevelopers);
+                filterDesignationInput.addEventListener('input', filterDevelopers);
+
+                function filterDevelopers() {
+                    const nameFilter = searchNameInput.value.toLowerCase();
+                    const designationFilter = filterDesignationInput.value.toLowerCase();
+
+                    data.developers.forEach(developer => {
+                        const row = developersTable.querySelector(`tr:nth-child(${developer.rowIndex})`);
+                        const nameMatch = developer.name.toLowerCase().includes(nameFilter);
+                        const designationMatch = developer.designation.toLowerCase().includes(designationFilter);
+
+                        row.style.display = nameMatch && designationMatch ? 'table-row' : 'none';
+                    });
+                }
+            });
+    </script>
+</body>
+</html>
